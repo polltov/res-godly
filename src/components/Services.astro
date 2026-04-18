@@ -27,7 +27,11 @@ const toneBg: Record<string, string> = {
     <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
       {services.map((service) => (
         <article
-          class={`relative flex flex-col rounded-[28px] border border-ink p-6 transition-transform duration-300 hover:-translate-y-1 md:p-7 ${toneBg[service.tone]}`}
+          role="button"
+          tabindex="0"
+          data-lead-trigger
+          data-lead-service={service.title}
+          class={`group relative flex cursor-pointer flex-col rounded-[28px] border border-ink p-6 transition-transform duration-300 hover:-translate-y-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-ink md:p-7 ${toneBg[service.tone]}`}
         >
           <div class="flex items-start justify-between">
             <span class="label text-ink/70">№ {service.number}</span>

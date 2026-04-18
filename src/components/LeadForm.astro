@@ -144,11 +144,26 @@ const tgUser = site.telegram.replace('https://t.me/', '');
       );
     };
 
+    const serviceSelect = form.querySelector('select[name="service"]');
+    const openDialog = (el) => {
+      setStatus('', 'muted');
+      const preset = el && el.getAttribute('data-lead-service');
+      if (serviceSelect && preset) {
+        const match = Array.from(serviceSelect.options).find((o) => o.value === preset);
+        if (match) serviceSelect.value = match.value;
+      }
+      dialog.showModal();
+    };
     document.querySelectorAll('[data-lead-trigger]').forEach((btn) => {
       btn.addEventListener('click', (e) => {
         e.preventDefault();
-        setStatus('', 'muted');
-        dialog.showModal();
+        openDialog(btn);
+      });
+      btn.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          openDialog(btn);
+        }
       });
     });
 
