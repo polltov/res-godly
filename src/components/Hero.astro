@@ -1,0 +1,99 @@
+---
+import { site } from '../config/site';
+---
+
+<section class="relative overflow-hidden px-6 pt-14 pb-12 md:px-10 md:pt-20 md:pb-16">
+  <div class="mx-auto grid max-w-[1400px] gap-10 md:grid-cols-12 md:items-end">
+    <!-- Massive logotype -->
+    <div class="md:col-span-7">
+      <p class="label mb-6 md:mb-8">Видеопродакшн · СПб · с 2014</p>
+      <h1 class="hero-letters relative text-[clamp(6.5rem,20vw,21rem)] text-ink">
+        <span class="relative inline-block">
+          <span class="relative z-10">RES</span>
+          <!-- Signature curved bar through the letters (Ujjo-style) -->
+          <svg
+            viewBox="0 0 520 80"
+            class="absolute left-[-4%] right-[-4%] top-[40%] z-20 w-[108%] -translate-y-1/2"
+            aria-hidden="true"
+          >
+            <path
+              d="M8 48 C 80 8, 180 76, 260 32 S 440 76, 512 28"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="9"
+              stroke-linecap="round"
+            />
+          </svg>
+        </span>
+        <span class="ml-[-0.05em] text-ink">.prod</span>
+      </h1>
+      <p class="mt-8 max-w-xl text-base text-ink/80 md:text-lg">
+        Бутиковая студия видеопроизводства. Рекламные и имиджевые ролики, съёмки
+        мероприятий, прямые трансляции. От идеи до финального монтажа — измеримый
+        результат для бизнеса.
+      </p>
+      <div class="mt-8 flex flex-wrap items-center gap-3">
+        <a href="#works" class="btn-ink">Посмотреть работы</a>
+        <a href={site.telegram} target="_blank" rel="noopener" class="btn-outline">
+          Обсудить проект
+        </a>
+      </div>
+    </div>
+
+    <!-- Showreel card -->
+    <div class="md:col-span-5">
+      <div
+        class="relative overflow-hidden rounded-[28px] border border-ink bg-lime p-6 md:p-8"
+      >
+        <p class="label mb-4 text-ink/70">Шоурил 2025</p>
+        <h2 class="font-display text-3xl leading-[0.95] tracking-tight text-ink md:text-4xl">
+          Конвертируем&nbsp;наш опыт&nbsp;в ваш&nbsp;результат.
+        </h2>
+        <div class="relative mt-6 aspect-[16/10] overflow-hidden rounded-2xl border border-ink/90 bg-ink">
+          <iframe
+            src={`https://player.vimeo.com/video/${site.showreelVimeoId}?title=0&byline=0&portrait=0&background=1&muted=1&loop=1&autoplay=1`}
+            class="absolute inset-0 h-full w-full"
+            allow="autoplay; fullscreen"
+            loading="lazy"
+            title="RES prod showreel"
+          ></iframe>
+        </div>
+        <div class="mt-5 flex items-center justify-between">
+          <a href="#works" class="label underline-offset-4 hover:underline">Все работы</a>
+          <a href={site.telegram} target="_blank" rel="noopener" class="btn-ink">
+            Написать
+          </a>
+        </div>
+        <!-- decorative spark -->
+        <svg
+          viewBox="0 0 40 40"
+          class="absolute right-6 top-6 h-8 w-8 text-ink/70"
+          aria-hidden="true"
+        >
+          <path
+            d="M20 2v12M20 26v12M2 20h12M26 20h12M7 7l8 8M25 25l8 8M33 7l-8 8M15 25l-8 8"
+            stroke="currentColor"
+            stroke-width="1.6"
+            stroke-linecap="round"
+          />
+        </svg>
+      </div>
+
+      <!-- metric ticker under card -->
+      <div class="mt-6 grid grid-cols-3 gap-3 text-center">
+        <div class="card py-4">
+          <p class="font-display text-2xl leading-none">10+</p>
+          <p class="label mt-2 text-ink/70">лет опыта</p>
+        </div>
+        <div class="card py-4">
+          <p class="font-display text-2xl leading-none">120+</p>
+          <p class="label mt-2 text-ink/70">проектов</p>
+        </div>
+        <div class="card py-4">
+          <p class="font-display text-2xl leading-none">24/7</p>
+          <p class="label mt-2 text-ink/70">съёмки</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

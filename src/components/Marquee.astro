@@ -1,0 +1,36 @@
+---
+interface Props {
+  items: string[];
+  tone?: 'ink' | 'lime' | 'violet';
+}
+const { items, tone = 'ink' } = Astro.props;
+
+const bg =
+  tone === 'lime' ? 'bg-lime text-ink' : tone === 'violet' ? 'bg-violet text-ink' : 'bg-ink text-cream';
+---
+
+<div class={`relative overflow-hidden border-y border-ink ${bg}`}>
+  <div class="marquee flex w-max gap-10 py-4 font-display text-2xl uppercase md:text-3xl">
+    {Array.from({ length: 6 }).map(() =>
+      items.map((item) => (
+        <span class="flex shrink-0 items-center gap-10">
+          <span>{item}</span>
+          <span class="inline-block h-3 w-3 rotate-45 border-2 border-current"></span>
+        </span>
+      ))
+    )}
+  </div>
+</div>
+
+<style>
+  .marquee {
+    animation: scroll 40s linear infinite;
+  }
+  @keyframes scroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .marquee { animation: none; }
+  }
+</style>

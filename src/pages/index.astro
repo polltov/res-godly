@@ -1,0 +1,36 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Hero from '../components/Hero.astro';
+import Marquee from '../components/Marquee.astro';
+import Services from '../components/Services.astro';
+import Testimonials from '../components/Testimonials.astro';
+import About from '../components/About.astro';
+import Clients from '../components/Clients.astro';
+import Works from '../components/Works.astro';
+---
+
+<Layout>
+  <Hero />
+  <Marquee
+    items={[
+      'превращаем идеи в ролики',
+      'снимаем с 2014',
+      'прямые трансляции',
+      'спб · выездные съёмки',
+    ]}
+    tone="ink"
+  />
+  <Services />
+  <Marquee
+    items={[
+      'опыт 10+ лет',
+      'кино-ритм в каждом кадре',
+      'конвертируем опыт в результат',
+    ]}
+    tone="lime"
+  />
+  <Clients />
+  <Testimonials />
+  <About />
+  <Works />
+</Layout>

@@ -1,0 +1,112 @@
+---
+import { works } from '../data/works';
+
+const featured = works.filter((w) => w.featured);
+const rest = works.filter((w) => !w.featured);
+
+const gradients = [
+  'linear-gradient(135deg, #0a0a0a 0%, #8779e8 100%)',
+  'linear-gradient(135deg, #0a0a0a 0%, #d9ff3d 180%)',
+  'linear-gradient(135deg, #0a0a0a 0%, #d8663e 140%)',
+  'linear-gradient(135deg, #0a0a0a 0%, #a296f5 120%)',
+];
+---
+
+<section id="works" class="relative border-t border-ink bg-cream-warm px-6 py-16 md:px-10 md:py-24">
+  <div class="mx-auto max-w-[1400px]">
+    <div class="mb-10 flex flex-col gap-4 md:mb-14 md:flex-row md:items-end md:justify-between">
+      <div>
+        <p class="label text-ink/60">Портфолио</p>
+        <h2 class="mt-3 font-display text-5xl leading-[0.95] md:text-7xl">
+          Избранные работы
+        </h2>
+      </div>
+      <p class="max-w-md text-sm text-ink/70 md:text-base">
+        Выборка из недавних проектов с федеральными брендами и независимыми
+        студиями. Полное портфолио — по запросу.
+      </p>
+    </div>
+
+    <!-- featured grid -->
+    <div class="grid grid-cols-1 gap-5 md:grid-cols-3 md:gap-6">
+      {featured.map((work, i) => {
+        const short = work.title.split(' · ')[1] ?? work.title;
+        const isHero = i === 0;
+        return (
+          <a
+            href={`https://vimeo.com/${work.vimeoId}`}
+            target="_blank"
+            rel="noopener"
+            class={`group relative block overflow-hidden rounded-[24px] border border-ink text-cream transition-all hover:-translate-y-1 ${isHero ? 'md:col-span-2' : ''}`}
+            style={`background: ${gradients[i % gradients.length]}`}
+          >
+            <div class={`relative flex flex-col justify-between ${isHero ? 'aspect-[16/9]' : 'aspect-[4/5]'} p-6 md:p-8`}>
+              <!-- top row -->
+              <div class="flex items-start justify-between gap-4">
+                <span class="label rounded-full border border-cream/40 bg-cream/10 px-3 py-1 backdrop-blur">
+                  {work.format}
+                </span>
+                <span class="label text-cream/60">{work.year}</span>
+              </div>
+
+              <!-- big client name -->
+              <div>
+                <p class="font-display text-[clamp(2.2rem,5vw,5rem)] leading-[0.88] tracking-tight text-cream">
+                  {work.client}
+                </p>
+                <p class="mt-3 max-w-sm text-sm text-cream/75 md:text-base">
+                  {short}
+                </p>
+              </div>
+
+              <!-- play circle -->
+              <div class="pointer-events-none absolute bottom-6 right-6 flex h-16 w-16 items-center justify-center rounded-full bg-lime text-ink opacity-0 transition-opacity duration-300 group-hover:opacity-100 md:bottom-8 md:right-8 md:h-20 md:w-20">
+                <svg viewBox="0 0 24 24" class="ml-1 h-7 w-7 md:h-9 md:w-9" aria-hidden="true">
+                  <polygon points="6,4 20,12 6,20" fill="currentColor" />
+                </svg>
+              </div>
+
+              <!-- decorative star/spark -->
+              <svg
+                viewBox="0 0 40 40"
+                class="pointer-events-none absolute right-6 top-1/2 h-10 w-10 -translate-y-1/2 text-lime opacity-40 transition-all duration-500 group-hover:rotate-90 group-hover:opacity-80 md:h-12 md:w-12"
+                aria-hidden="true"
+              >
+                <path
+                  d="M20 2v12M20 26v12M2 20h12M26 20h12M7 7l8 8M25 25l8 8M33 7l-8 8M15 25l-8 8"
+                  stroke="currentColor"
+                  stroke-width="1.6"
+                  stroke-linecap="round"
+                />
+              </svg>
+            </div>
+          </a>
+        );
+      })}
+    </div>
+
+    <!-- supplementary compact -->
+    {rest.length > 0 && (
+      <div class="mt-8 grid grid-cols-1 gap-3 md:grid-cols-2 md:gap-4">
+        {rest.map((work) => (
+          <a
+            href={`https://vimeo.com/${work.vimeoId}`}
+            target="_blank"
+            rel="noopener"
+            class="flex items-center justify-between gap-4 rounded-2xl border border-ink bg-cream px-5 py-4 transition-colors hover:bg-lime"
+          >
+            <div>
+              <p class="label text-ink/60">{work.client} · {work.year}</p>
+              <p class="mt-1 font-display text-lg leading-tight">
+                {work.title.split(' · ')[1] ?? work.title}
+              </p>
+            </div>
+            <span class="label shrink-0 rounded-full border border-ink px-3 py-1">
+              {work.format}
+            </span>
+          </a>
+        ))}
+      </div>
+    )}
+  </div>
+</section>

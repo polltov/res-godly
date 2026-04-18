@@ -1,0 +1,128 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-cream: #f2ecdf;
+  --color-cream-warm: #ebe4d2;
+  --color-ink: #0a0a0a;
+  --color-ink-soft: #1c1c1c;
+  --color-lime: #d9ff3d;
+  --color-lime-deep: #b4e02a;
+  --color-violet: #a296f5;
+  --color-violet-deep: #8779e8;
+  --color-clay: #d8663e;
+
+  --font-display: 'Boldonse', 'Tanker', 'Cabinet Grotesk', serif;
+  --font-body: 'General Sans', 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+@font-face {
+  font-family: 'Boldonse';
+  src: url('https://cdn.jsdelivr.net/gh/Pendlera/Boldonse@main/fonts/webfonts/Boldonse-Regular.woff2') format('woff2');
+  font-display: swap;
+  font-weight: 400;
+}
+
+@layer base {
+  html {
+    background: var(--color-cream);
+    color: var(--color-ink);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    min-height: 100dvh;
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background: var(--color-lime);
+    color: var(--color-ink);
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: -0.015em;
+  }
+}
+
+@layer components {
+  .hero-letters {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-style: normal;
+    letter-spacing: -0.05em;
+    line-height: 0.82;
+    text-transform: uppercase;
+  }
+
+  .label {
+    font-family: var(--font-body);
+    font-weight: 500;
+    font-size: 0.68rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+  }
+
+  .btn,
+  .btn-ink,
+  .btn-lime,
+  .btn-outline {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    padding: 0.75rem 1.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    transition: all 200ms ease;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  .btn-ink {
+    background: var(--color-ink);
+    color: var(--color-cream);
+  }
+  .btn-ink:hover {
+    background: var(--color-violet-deep);
+  }
+
+  .btn-lime {
+    background: var(--color-lime);
+    color: var(--color-ink);
+  }
+  .btn-lime:hover {
+    background: var(--color-lime-deep);
+  }
+
+  .btn-outline {
+    border: 1px solid var(--color-ink);
+    color: var(--color-ink);
+    background: transparent;
+  }
+  .btn-outline:hover {
+    background: var(--color-ink);
+    color: var(--color-cream);
+  }
+
+  .card {
+    border-radius: 1.5rem;
+    border: 1px solid rgb(10 10 10 / 0.9);
+    background: var(--color-cream);
+    padding: 1.5rem;
+  }
+
+  .card-lime {
+    border-radius: 28px;
+    border: 1px solid var(--color-ink);
+    background: var(--color-lime);
+    padding: 1.5rem;
+    position: relative;
+  }
+}

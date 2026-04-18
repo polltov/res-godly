@@ -1,0 +1,210 @@
+---
+import { site } from '../config/site';
+
+type Stage = {
+  number: string;
+  title: string;
+  body: string;
+  tone: 'lime' | 'violet' | 'cream' | 'ink';
+  icon: 'brief' | 'script' | 'shoot' | 'edit';
+};
+
+const stages: Stage[] = [
+  {
+    number: '01',
+    title: 'Бриф',
+    body: 'Разбираемся в задаче, аудитории и метриках. Формулируем измеримую цель.',
+    tone: 'lime',
+    icon: 'brief',
+  },
+  {
+    number: '02',
+    title: 'Сценарий',
+    body: 'Идея, раскадровка, референсы. Согласовываем каждую сцену до съёмки.',
+    tone: 'violet',
+    icon: 'script',
+  },
+  {
+    number: '03',
+    title: 'Съёмка',
+    body: 'Локация, свет, многокамерная команда. Контролируем кадр и звук вживую.',
+    tone: 'cream',
+    icon: 'shoot',
+  },
+  {
+    number: '04',
+    title: 'Монтаж',
+    body: 'Ритм, цвет, звук, графика. Собираем финальный фильм и режем нарезки.',
+    tone: 'ink',
+    icon: 'edit',
+  },
+];
+
+const toneClasses: Record<string, string> = {
+  lime: 'bg-lime text-ink',
+  violet: 'bg-violet text-ink',
+  cream: 'bg-cream-warm text-ink',
+  ink: 'bg-ink text-cream',
+};
+---
+
+<section id="about" class="relative overflow-hidden px-6 py-16 md:px-10 md:py-24">
+  <div class="mx-auto max-w-[1400px]">
+    <div class="grid gap-12 md:grid-cols-12 md:gap-16">
+      <!-- Left: title + story -->
+      <div class="md:col-span-7">
+        <p class="label text-ink/60">О студии</p>
+        <h2 class="mt-3 font-display text-6xl leading-[0.9] md:text-[7rem]">
+          Про{' '}
+          <span class="relative inline-block">
+            нас
+            <svg
+              viewBox="0 0 200 30"
+              class="absolute -bottom-2 left-0 right-0 w-full"
+              aria-hidden="true"
+            >
+              <path
+                d="M4 20 Q 50 4, 100 18 T 196 14"
+                stroke="currentColor"
+                stroke-width="3"
+                fill="none"
+                stroke-linecap="round"
+              />
+            </svg>
+          </span>
+        </h2>
+
+        <div class="mt-10 max-w-xl space-y-5 text-base text-ink/85 md:text-lg">
+          <p>
+            Мы — команда с опытом более <strong>10 лет</strong> в
+            видеопроизводстве. Создаём видео высокого уровня для любых задач: от
+            коротких роликов для соцсетей до масштабных рекламных кампаний.
+          </p>
+          <p>
+            Обеспечиваем качественные онлайн-трансляции и помогаем воплотить
+            идеи в результат для бизнеса. Работаем с федеральными брендами и
+            независимыми проектами — и одинаково выкладываемся в каждом.
+          </p>
+          <p class="font-display text-2xl leading-tight text-ink md:text-3xl">
+            «{site.utp}.»
+          </p>
+        </div>
+
+        <div class="mt-10 flex flex-wrap items-center gap-3">
+          <a href={site.telegram} target="_blank" rel="noopener" class="btn-ink">
+            Обсудить проект
+          </a>
+          <a href={`mailto:${site.email}`} class="btn-outline">Написать на почту</a>
+        </div>
+      </div>
+
+      <!-- Right: 4 stages of production cycle -->
+      <div class="relative md:col-span-5">
+        <p class="label mb-5 text-ink/60 md:mb-6">Цикл производства · 4 этапа</p>
+
+        <div class="grid grid-cols-2 gap-4">
+          {stages.map((stage, i) => (
+            <article
+              class={`stage-card group relative flex min-h-[240px] flex-col justify-between rounded-[28px] border border-ink p-5 transition-all duration-300 hover:-translate-y-1 hover:rotate-[-0.5deg] hover:shadow-[6px_6px_0_rgba(10,10,10,0.9)] ${toneClasses[stage.tone]}`}
+            >
+              <!-- icon -->
+              <div class="flex items-start justify-between">
+                <div class="h-14 w-14 transition-transform duration-500 ease-out group-hover:scale-110 group-hover:rotate-[-8deg]">
+                  {stage.icon === 'brief' && (
+                    <svg viewBox="0 0 64 64" class="h-full w-full" aria-hidden="true">
+                      <rect x="10" y="8" width="38" height="50" rx="3" fill="none" stroke="currentColor" stroke-width="3" />
+                      <line x1="18" y1="20" x2="40" y2="20" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+                      <line x1="18" y1="30" x2="40" y2="30" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+                      <line x1="18" y1="40" x2="32" y2="40" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+                      <circle cx="50" cy="50" r="8" fill="currentColor" />
+                      <path d="M46 50 l3 3 l6 -6" stroke="#d9ff3d" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+                    </svg>
+                  )}
+                  {stage.icon === 'script' && (
+                    <svg viewBox="0 0 64 64" class="h-full w-full" aria-hidden="true">
+                      <rect x="6" y="10" width="16" height="12" rx="1.5" fill="none" stroke="currentColor" stroke-width="3" />
+                      <rect x="24" y="10" width="16" height="12" rx="1.5" fill="none" stroke="currentColor" stroke-width="3" />
+                      <rect x="42" y="10" width="16" height="12" rx="1.5" fill="currentColor" />
+                      <rect x="6" y="30" width="16" height="12" rx="1.5" fill="currentColor" />
+                      <rect x="24" y="30" width="16" height="12" rx="1.5" fill="none" stroke="currentColor" stroke-width="3" />
+                      <rect x="42" y="30" width="16" height="12" rx="1.5" fill="none" stroke="currentColor" stroke-width="3" />
+                      <line x1="6" y1="52" x2="58" y2="52" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+                    </svg>
+                  )}
+                  {stage.icon === 'shoot' && (
+                    <svg viewBox="0 0 64 64" class="h-full w-full" aria-hidden="true">
+                      <!-- clapperboard -->
+                      <rect x="6" y="22" width="52" height="34" rx="2" fill="none" stroke="currentColor" stroke-width="3" />
+                      <polygon
+                        points="6,8 58,8 54,22 6,22"
+                        fill="currentColor"
+                      />
+                      <line x1="10" y1="15" x2="18" y2="11" stroke="#d9ff3d" stroke-width="2.5" stroke-linecap="round" />
+                      <line x1="20" y1="15" x2="28" y2="11" stroke="#d9ff3d" stroke-width="2.5" stroke-linecap="round" />
+                      <line x1="30" y1="15" x2="38" y2="11" stroke="#d9ff3d" stroke-width="2.5" stroke-linecap="round" />
+                      <line x1="40" y1="15" x2="48" y2="11" stroke="#d9ff3d" stroke-width="2.5" stroke-linecap="round" />
+                      <circle cx="32" cy="39" r="6" fill="currentColor" />
+                    </svg>
+                  )}
+                  {stage.icon === 'edit' && (
+                    <svg viewBox="0 0 64 64" class="h-full w-full" aria-hidden="true">
+                      <!-- timeline + play -->
+                      <line x1="4" y1="18" x2="60" y2="18" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+                      <rect x="6" y="22" width="16" height="10" rx="2" fill="currentColor" />
+                      <rect x="26" y="22" width="28" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="3" />
+                      <rect x="6" y="36" width="30" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="3" />
+                      <rect x="40" y="36" width="18" height="10" rx="2" fill="currentColor" />
+                      <polygon points="24,50 42,58 24,58" fill="currentColor" transform="translate(0 -2)" />
+                    </svg>
+                  )}
+                </div>
+                <span
+                  class={`label transition-all duration-300 group-hover:translate-x-[-2px] group-hover:opacity-100 ${stage.tone === 'ink' ? 'text-cream/60 group-hover:text-cream' : 'text-ink/60 group-hover:text-ink'}`}
+                >
+                  {stage.number}
+                </span>
+              </div>
+
+              <div>
+                <h3 class="font-display text-2xl leading-tight md:text-3xl">
+                  {stage.title}
+                </h3>
+                <p
+                  class={`mt-2 text-sm leading-snug ${stage.tone === 'ink' ? 'text-cream/80' : 'text-ink/80'}`}
+                >
+                  {stage.body}
+                </p>
+              </div>
+
+              {i < stages.length - 1 && (
+                <div
+                  class="pointer-events-none absolute -right-3 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-ink bg-cream text-ink shadow-[2px_2px_0_rgba(10,10,10,0.9)] transition-transform duration-300 group-hover:translate-x-1"
+                  aria-hidden="true"
+                  style={i % 2 === 0 ? '' : 'display: none'}
+                >
+                  <svg viewBox="0 0 24 24" class="h-5 w-5">
+                    <path
+                      d="M5 12h14M13 5l7 7-7 7"
+                      stroke="currentColor"
+                      stroke-width="2.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      fill="none"
+                    />
+                  </svg>
+                </div>
+              )}
+            </article>
+          ))}
+        </div>
+
+        <!-- floating sticker hanging below the grid; only its top edge overlaps cards 3–4 junction -->
+        <div
+          class="absolute -bottom-20 left-1/2 flex h-24 w-24 -translate-x-1/2 rotate-[-14deg] items-center justify-center rounded-full border border-ink bg-cream font-display text-lg leading-tight text-ink shadow-[4px_4px_0_rgba(10,10,10,0.9)] md:-bottom-20 md:h-28 md:w-28 md:text-xl"
+        >
+          <span class="text-center">10+<br />лет</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
