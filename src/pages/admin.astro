@@ -1,0 +1,300 @@
+---
+import '../styles/global.css';
+import { LEADS_API } from '../config/api';
+import { site } from '../config/site';
+
+const leadsApi = LEADS_API;
+---
+
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="preload" href="/fonts/GeneralSans-Medium.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/GeneralSans-Regular.woff2" as="font" type="font/woff2" crossorigin />
+    <title>Админка — {site.name}</title>
+  </head>
+  <body class="bg-cream text-ink antialiased">
+    <main class="mx-auto max-w-[1280px] px-6 py-10 md:px-10 md:py-14">
+      <header class="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+        <div>
+          <p class="label text-ink/60">Админ-панель</p>
+          <h1 class="mt-2 font-display text-4xl leading-tight md:text-6xl">Заявки с сайта</h1>
+        </div>
+        <div class="flex items-center gap-3 text-sm text-ink/70">
+          <span id="admin-user-label"></span>
+          <button type="button" id="btn-refresh" class="btn-outline">Обновить</button>
+          <button type="button" id="btn-export" class="btn-outline">CSV</button>
+          <button type="button" id="btn-logout" class="btn-outline">Выйти</button>
+        </div>
+      </header>
+
+      <!-- Login -->
+      <section id="login-card" class="mt-10 max-w-md rounded-[24px] border border-ink bg-cream-warm p-6 md:p-8">
+        <h2 class="font-display text-2xl leading-tight md:text-3xl">Войти в админку</h2>
+        <p class="mt-2 text-sm text-ink/70">Укажите логин и пароль, выданные администратором.</p>
+        <form id="login-form" class="mt-6 space-y-4">
+          <label class="block">
+            <span class="label text-ink/70">Логин</span>
+            <input
+              name="user"
+              type="text"
+              autocomplete="username"
+              required
+              class="mt-2 w-full rounded-xl border border-ink bg-transparent px-4 py-3 text-base text-ink placeholder:text-ink/40 focus:outline-none focus:ring-2 focus:ring-ink"
+            />
+          </label>
+          <label class="block">
+            <span class="label text-ink/70">Пароль</span>
+            <input
+              name="pass"
+              type="password"
+              autocomplete="current-password"
+              required
+              class="mt-2 w-full rounded-xl border border-ink bg-transparent px-4 py-3 text-base text-ink placeholder:text-ink/40 focus:outline-none focus:ring-2 focus:ring-ink"
+            />
+          </label>
+          <label class="flex items-center gap-2 text-sm text-ink/80">
+            <input id="remember" type="checkbox" checked class="h-4 w-4 accent-ink" />
+            Запомнить до закрытия браузера
+          </label>
+          <div class="flex items-center justify-between gap-3">
+            <button type="submit" class="btn-ink">Войти</button>
+            <p id="login-status" class="text-sm text-ink/60" role="status" aria-live="polite"></p>
+          </div>
+        </form>
+      </section>
+
+      <!-- Leads view -->
+      <section id="leads-card" class="mt-10 hidden">
+        <div class="mb-4 flex flex-wrap items-center gap-3 text-sm text-ink/70">
+          <span id="leads-count">0 заявок</span>
+          <input
+            id="leads-filter"
+            type="search"
+            placeholder="Поиск по имени / телефону / услуге"
+            class="ml-auto w-full max-w-sm rounded-xl border border-ink bg-transparent px-4 py-2 text-sm text-ink placeholder:text-ink/40 focus:outline-none focus:ring-2 focus:ring-ink"
+          />
+        </div>
+
+        <div class="overflow-x-auto rounded-[20px] border border-ink">
+          <table class="w-full min-w-[680px] text-left text-sm md:text-base">
+            <thead class="bg-ink text-cream">
+              <tr>
+                <th class="px-4 py-3 font-medium">Дата</th>
+                <th class="px-4 py-3 font-medium">Имя</th>
+                <th class="px-4 py-3 font-medium">Телефон</th>
+                <th class="px-4 py-3 font-medium">Тип ролика</th>
+                <th class="px-4 py-3 font-medium">IP</th>
+                <th class="px-4 py-3 font-medium text-right">⚙</th>
+              </tr>
+            </thead>
+            <tbody id="leads-tbody" class="divide-y divide-ink/15"></tbody>
+          </table>
+        </div>
+
+        <p id="leads-empty" class="mt-6 hidden text-center text-sm text-ink/60">Пока ни одной заявки.</p>
+      </section>
+    </main>
+
+    <script is:inline define:vars={{ leadsApi }}>
+      const SESSION_KEY = 'resprod_admin_auth';
+      const loginCard = document.getElementById('login-card');
+      const leadsCard = document.getElementById('leads-card');
+      const loginForm = document.getElementById('login-form');
+      const loginStatus = document.getElementById('login-status');
+      const userLabel = document.getElementById('admin-user-label');
+      const tbody = document.getElementById('leads-tbody');
+      const countEl = document.getElementById('leads-count');
+      const emptyEl = document.getElementById('leads-empty');
+      const filter = document.getElementById('leads-filter');
+      const btnRefresh = document.getElementById('btn-refresh');
+      const btnExport = document.getElementById('btn-export');
+      const btnLogout = document.getElementById('btn-logout');
+
+      let creds = null;
+      let leads = [];
+
+      const readStoredCreds = () => {
+        try {
+          const s = sessionStorage.getItem(SESSION_KEY) || localStorage.getItem(SESSION_KEY);
+          if (!s) return null;
+          const parsed = JSON.parse(s);
+          if (parsed && parsed.basic) return parsed;
+          return null;
+        } catch (_) { return null; }
+      };
+      const storeCreds = (basic, user, persist) => {
+        const payload = JSON.stringify({ basic, user });
+        (persist ? sessionStorage : sessionStorage).setItem(SESSION_KEY, payload);
+      };
+      const clearCreds = () => {
+        sessionStorage.removeItem(SESSION_KEY);
+        localStorage.removeItem(SESSION_KEY);
+      };
+
+      const showLogin = () => {
+        loginCard.classList.remove('hidden');
+        leadsCard.classList.add('hidden');
+        userLabel.textContent = '';
+      };
+      const showLeads = () => {
+        loginCard.classList.add('hidden');
+        leadsCard.classList.remove('hidden');
+        if (creds && creds.user) userLabel.textContent = creds.user + ' · ';
+      };
+
+      const formatDate = (iso) => {
+        try {
+          const d = new Date(iso);
+          return d.toLocaleString('ru-RU', {
+            day: '2-digit', month: '2-digit', year: 'numeric',
+            hour: '2-digit', minute: '2-digit',
+          });
+        } catch (_) { return iso; }
+      };
+
+      const fetchLeads = async () => {
+        if (!creds) return;
+        try {
+          const res = await fetch(leadsApi + '/api/leads', {
+            headers: { Authorization: 'Basic ' + creds.basic },
+          });
+          if (res.status === 401) {
+            clearCreds();
+            creds = null;
+            loginStatus.textContent = 'Сессия истекла, войдите снова.';
+            loginStatus.classList.add('text-red-700');
+            showLogin();
+            return;
+          }
+          if (!res.ok) throw new Error('http ' + res.status);
+          const data = await res.json();
+          leads = Array.isArray(data.leads) ? data.leads : [];
+          render();
+        } catch (e) {
+          countEl.textContent = 'Ошибка загрузки: ' + String(e);
+        }
+      };
+
+      const render = () => {
+        const q = (filter.value || '').trim().toLowerCase();
+        const filtered = q
+          ? leads.filter((l) => (l.name + ' ' + l.phone + ' ' + l.service).toLowerCase().includes(q))
+          : leads;
+        countEl.textContent = filtered.length + ' из ' + leads.length + ' заявок';
+        tbody.innerHTML = '';
+        if (!filtered.length) {
+          emptyEl.classList.remove('hidden');
+          return;
+        }
+        emptyEl.classList.add('hidden');
+        for (const l of filtered) {
+          const tr = document.createElement('tr');
+          tr.className = 'hover:bg-lime/20';
+          tr.innerHTML = [
+            '<td class="px-4 py-3 text-ink/70">' + formatDate(l.createdAt) + '</td>',
+            '<td class="px-4 py-3 font-medium">' + escape(l.name) + '</td>',
+            '<td class="px-4 py-3"><a class="underline-offset-4 hover:underline" href="tel:' + escape(l.phone) + '">' + escape(l.phone) + '</a></td>',
+            '<td class="px-4 py-3">' + escape(l.service) + '</td>',
+            '<td class="px-4 py-3 text-xs text-ink/50">' + escape(l.ip || '—') + '</td>',
+            '<td class="px-4 py-3 text-right"><button type="button" data-del="' + escape(l.id) + '" class="text-xs text-ink/50 hover:text-red-700">удалить</button></td>',
+          ].join('');
+          tbody.appendChild(tr);
+        }
+      };
+
+      const escape = (s) => String(s == null ? '' : s)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+
+      const exportCsv = () => {
+        const rows = [['createdAt', 'name', 'phone', 'service', 'ip', 'id']];
+        for (const l of leads) rows.push([l.createdAt, l.name, l.phone, l.service, l.ip || '', l.id]);
+        const csv = rows.map((r) => r.map((c) => '"' + String(c).replace(/"/g, '""') + '"').join(',')).join('\n');
+        const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'leads-' + new Date().toISOString().slice(0, 10) + '.csv';
+        a.click();
+        URL.revokeObjectURL(a.href);
+      };
+
+      const deleteLead = async (id) => {
+        if (!creds) return;
+        if (!confirm('Удалить заявку?')) return;
+        try {
+          const res = await fetch(leadsApi + '/api/lead?id=' + encodeURIComponent(id), {
+            method: 'DELETE',
+            headers: { Authorization: 'Basic ' + creds.basic },
+          });
+          if (!res.ok) throw new Error('http ' + res.status);
+          leads = leads.filter((l) => l.id !== id);
+          render();
+        } catch (e) {
+          alert('Не удалось удалить: ' + e);
+        }
+      };
+
+      loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        loginStatus.textContent = '';
+        loginStatus.classList.remove('text-red-700');
+        const fd = new FormData(loginForm);
+        const user = String(fd.get('user') || '').trim();
+        const pass = String(fd.get('pass') || '');
+        if (!user || !pass) return;
+        const basic = btoa(user + ':' + pass);
+        try {
+          const res = await fetch(leadsApi + '/api/leads', {
+            headers: { Authorization: 'Basic ' + basic },
+          });
+          if (res.status === 401) {
+            loginStatus.textContent = 'Неверный логин или пароль';
+            loginStatus.classList.add('text-red-700');
+            return;
+          }
+          if (!res.ok) throw new Error('http ' + res.status);
+          creds = { basic, user };
+          storeCreds(basic, user, !!document.getElementById('remember').checked);
+          const data = await res.json();
+          leads = Array.isArray(data.leads) ? data.leads : [];
+          showLeads();
+          render();
+        } catch (err) {
+          loginStatus.textContent = 'Сервер недоступен: ' + err;
+          loginStatus.classList.add('text-red-700');
+        }
+      });
+
+      tbody.addEventListener('click', (e) => {
+        const t = e.target;
+        if (t instanceof HTMLElement) {
+          const id = t.getAttribute('data-del');
+          if (id) deleteLead(id);
+        }
+      });
+
+      filter.addEventListener('input', render);
+      btnRefresh.addEventListener('click', fetchLeads);
+      btnExport.addEventListener('click', exportCsv);
+      btnLogout.addEventListener('click', () => {
+        clearCreds();
+        creds = null;
+        showLogin();
+      });
+
+      // auto-login from stored creds
+      const stored = readStoredCreds();
+      if (stored && stored.basic) {
+        creds = stored;
+        showLeads();
+        fetchLeads();
+      } else {
+        showLogin();
+      }
+    </script>
+  </body>
+</html>

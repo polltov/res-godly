@@ -1,8 +1,10 @@
 ---
 import { services } from '../data/services';
 import { site } from '../config/site';
+import { LEADS_API } from '../config/api';
 
 const tgUser = site.telegram.replace('https://t.me/', '');
+const leadsApi = LEADS_API;
 ---
 
 <dialog
@@ -130,7 +132,7 @@ const tgUser = site.telegram.replace('https://t.me/', '');
   }
 </style>
 
-<script is:inline define:vars={{ tgUser }}>
+<script is:inline define:vars={{ tgUser, leadsApi }}>
   const dialog = document.getElementById('lead-dialog');
   const form = document.getElementById('lead-form');
   const status = document.getElementById('lead-status');
@@ -185,7 +187,19 @@ const tgUser = site.telegram.replace('https://t.me/', '');
       }
     });
 
-    form.addEventListener('submit', (e) => {
+    const openTelegramFallback = (name, ph, service) => {
+      const lines = [
+        'Заявка с сайта RES.PROD',
+        '',
+        `Имя: ${name}`,
+        `Телефон: ${ph}`,
+        `Тип ролика: ${service}`,
+      ];
+      const text = encodeURIComponent(lines.join('\n'));
+      window.open(`https://t.me/${tgUser}?text=${text}`, '_blank', 'noopener');
+    };
+
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const data = new FormData(form);
       const name = String(data.get('name') || '').trim();
@@ -202,20 +216,40 @@ const tgUser = site.telegram.replace('https://t.me/', '');
         return;
       }
 
-      const lines = [
-        'Заявка с сайта RES.PROD',
-        '',
-        `Имя: ${name}`,
-        `Телефон: ${ph}`,
-        `Тип ролика: ${service}`,
-      ];
-      const text = encodeURIComponent(lines.join('\n'));
-      const url = `https://t.me/${tgUser}?text=${text}`;
+      const submitBtn = form.querySelector('button[type="submit"]');
+      if (submitBtn) submitBtn.setAttribute('disabled', '');
+      setStatus('Отправляем заявку…', 'muted');
 
-      setStatus('Открываем Telegram — подтвердите отправку.', 'ok');
-      window.open(url, '_blank', 'noopener');
-      form.reset();
-      setTimeout(() => dialog.close(), 900);
+      let sent = false;
+      try {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 7000);
+        const res = await fetch(`${leadsApi}/api/lead`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, phone: ph, service, consent: true }),
+          signal: controller.signal,
+        });
+        clearTimeout(timer);
+        if (res.ok) {
+          sent = true;
+        }
+      } catch (_) {
+        // network error — fall through to Telegram fallback
+      }
+
+      if (submitBtn) submitBtn.removeAttribute('disabled');
+
+      if (sent) {
+        setStatus('Заявка принята! Скоро свяжемся.', 'ok');
+        form.reset();
+        setTimeout(() => dialog.close(), 1400);
+      } else {
+        setStatus('Не дозвонились до сервера. Откроем Telegram — подтвердите отправку.', 'error');
+        openTelegramFallback(name, ph, service);
+        form.reset();
+        setTimeout(() => dialog.close(), 1200);
+      }
     });
   }
 </script>

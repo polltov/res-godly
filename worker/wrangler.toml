@@ -1,0 +1,11 @@
+name = "res-prod-leads"
+main = "src/index.ts"
+compatibility_date = "2026-04-18"
+account_id = "a1d1ea831adc3dcb36bcc3abc6f668bb"
+
+[[kv_namespaces]]
+binding = "LEADS"
+id = "beaf9f1a1d1a464392fec83ba6cc81df"
+
+[observability]
+enabled = true
