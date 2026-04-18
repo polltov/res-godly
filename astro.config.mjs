@@ -5,7 +5,6 @@ import tailwindcss from '@tailwindcss/vite';
 // https://astro.build/config
 export default defineConfig({
   site: 'https://polltov.github.io',
-  base: '/res-godly',
   trailingSlash: 'ignore',
   vite: {
     plugins: [tailwindcss()],
