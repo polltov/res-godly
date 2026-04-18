@@ -61,7 +61,9 @@
     align-items: baseline;
     opacity: 0;
     transform: translateY(20px);
-    animation: splashLettersIn 700ms cubic-bezier(0.2, 0.85, 0.25, 1) 80ms forwards;
+  }
+  .splash.is-ready .splash-letters {
+    animation: splashLettersIn 700ms cubic-bezier(0.2, 0.85, 0.25, 1) forwards;
   }
   .splash-prod {
     margin-left: -0.05em;
@@ -74,7 +76,9 @@
     width: 108%;
     transform: translateY(-50%) scaleX(0);
     transform-origin: left center;
-    animation: splashBarDraw 760ms cubic-bezier(0.2, 0.85, 0.25, 1) 360ms forwards;
+  }
+  .splash.is-ready .splash-bar {
+    animation: splashBarDraw 760ms cubic-bezier(0.2, 0.85, 0.25, 1) 280ms forwards;
   }
   .splash-track {
     width: clamp(180px, 28vw, 260px);
@@ -83,14 +87,18 @@
     background: color-mix(in oklab, currentColor 14%, transparent);
     overflow: hidden;
     opacity: 0;
-    animation: splashFadeIn 400ms ease-out 300ms forwards;
+  }
+  .splash.is-ready .splash-track {
+    animation: splashFadeIn 400ms ease-out 220ms forwards;
   }
   .splash-fill {
     width: 100%;
     height: 100%;
     background: currentColor;
     transform: translateX(-100%);
-    animation: splashProgress 1800ms cubic-bezier(0.3, 0.7, 0.3, 1) 400ms forwards;
+  }
+  .splash.is-ready .splash-fill {
+    animation: splashProgress 1800ms cubic-bezier(0.3, 0.7, 0.3, 1) 320ms forwards;
   }
   @keyframes splashLettersIn {
     to { opacity: 1; transform: translateY(0); }
@@ -120,8 +128,9 @@
 
 <script is:inline>
   (function () {
-    const MIN_DURATION = 2200;
-    const MAX_DURATION = 5000;
+    const MIN_VISIBLE = 2200;
+    const FONT_TIMEOUT = 1500;
+    const HARD_CAP = 6000;
     const SESSION_KEY = 'resprod_splash_seen';
 
     try {
@@ -133,7 +142,8 @@
     } catch (_) {}
 
     document.documentElement.classList.add('splash-active');
-    const start = performance.now();
+    const splash = document.getElementById('splash');
+    if (!splash) return;
 
     const hide = () => {
       const el = document.getElementById('splash');
@@ -144,19 +154,35 @@
       setTimeout(() => el.remove(), 600);
     };
 
-    const ready = () => {
-      const elapsed = performance.now() - start;
-      const wait = Math.max(0, MIN_DURATION - elapsed);
-      setTimeout(hide, wait);
-    };
+    const fontsReady = new Promise((resolve) => {
+      let done = false;
+      const finish = () => { if (!done) { done = true; resolve(); } };
+      if (document.fonts && typeof document.fonts.load === 'function') {
+        Promise.all([
+          document.fonts.load('1em Boldonse').catch(() => null),
+          document.fonts.ready.catch(() => null),
+        ]).then(finish);
+      } else {
+        finish();
+      }
+      setTimeout(finish, FONT_TIMEOUT);
+    });
 
-    if (document.readyState === 'complete') {
-      ready();
-    } else {
-      window.addEventListener('load', ready, { once: true });
-    }
+    let startVisible = 0;
+    fontsReady.then(() => {
+      splash.classList.add('is-ready');
+      startVisible = performance.now();
+
+      const scheduleHide = () => {
+        const elapsed = performance.now() - startVisible;
+        setTimeout(hide, Math.max(0, MIN_VISIBLE - elapsed));
+      };
+      if (document.readyState === 'complete') scheduleHide();
+      else window.addEventListener('load', scheduleHide, { once: true });
+    });
+
     setTimeout(() => {
       if (document.getElementById('splash')) hide();
-    }, MAX_DURATION);
+    }, HARD_CAP);
   })();
 </script>
