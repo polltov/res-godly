@@ -197,18 +197,34 @@ const leadsApi = LEADS_API;
       else if (d.length && !d.startsWith('7')) d = '7' + d;
       return d.slice(0, 11);
     };
-    const paintPhone = () => {
-      const digits = normalizeDigits(phone.value);
+    let lastDigits = '';
+    const paintPhone = (e) => {
+      let digits = normalizeDigits(phone.value);
+      const deleting =
+        e && (e.inputType === 'deleteContentBackward' ||
+              e.inputType === 'deleteContentForward' ||
+              e.inputType === 'deleteByCut');
+      // If user hit backspace on a separator, digit string didn't shrink
+      // naturally — drop one manually so the mask can actually collapse.
+      if (deleting && digits === lastDigits && digits.length > 0) {
+        digits = digits.slice(0, -1);
+      }
+      // Edge case: user backspaced the whole "+7 " prefix — don't auto-
+      // force a leading 7 back in, leave the field truly empty.
+      if (deleting && digits === '7' && phone.value.replace(/\D/g, '') === '') {
+        digits = '';
+      }
+      lastDigits = digits;
       phone.value = formatRu(digits);
       const end = phone.value.length;
       phone.setSelectionRange(end, end);
     };
     phone.addEventListener('input', paintPhone);
-    phone.addEventListener('paste', () => setTimeout(paintPhone, 0));
+    phone.addEventListener('paste', () => setTimeout(() => paintPhone(null), 0));
     phone.addEventListener('focus', () => {
-      // Pre-seed "+7 " so the user starts typing straight into the mask
       if (!phone.value) {
         phone.value = '+7 ';
+        lastDigits = '7';
         const end = phone.value.length;
         phone.setSelectionRange(end, end);
       }
