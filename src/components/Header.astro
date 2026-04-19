@@ -1,31 +1,20 @@
 ---
 import { site } from '../config/site';
 
-const navLeft = [
+const nav = [
   { label: 'Работы', href: '#works' },
   { label: 'Услуги', href: '#services' },
-];
-const navRight = [
   { label: 'О студии', href: '#about' },
   { label: 'Контакты', href: '#contacts' },
 ];
 ---
 
 <header class="sticky top-0 z-40 border-b border-ink/90 bg-cream/85 backdrop-blur-md">
-  <div class="mx-auto grid max-w-[1400px] grid-cols-[1fr_auto_1fr] items-center gap-6 px-6 py-4 md:px-10">
-    <nav class="flex items-center gap-6 md:gap-8">
-      {navLeft.map((item) => (
-        <a
-          href={item.href}
-          class="label text-ink/80 transition-colors hover:text-ink"
-        >
-          {item.label}
-        </a>
-      ))}
-    </nav>
+  <div class="mx-auto flex max-w-[1400px] items-center justify-between gap-4 px-5 py-3 md:px-8 lg:gap-8 lg:py-4">
+    <!-- Logo -->
     <a
       href={import.meta.env.BASE_URL}
-      class="relative inline-block font-display text-[28px] leading-none tracking-tight text-ink md:text-[32px]"
+      class="relative inline-block shrink-0 font-display text-[24px] leading-none tracking-tight text-ink md:text-[28px] lg:text-[32px]"
       aria-label="RES prod"
     >
       <span class="relative z-10">RES</span>
@@ -43,23 +32,53 @@ const navRight = [
         />
       </svg>
     </a>
-    <nav class="flex items-center justify-end gap-6 md:gap-8">
-      {navRight.map((item) => (
+
+    <!-- Desktop nav (≥lg) -->
+    <nav class="hidden items-center gap-7 lg:flex">
+      {nav.map((item) => (
         <a
           href={item.href}
-          class="label text-ink/80 transition-colors hover:text-ink"
+          class="label whitespace-nowrap text-ink/80 transition-colors hover:text-ink"
         >
           {item.label}
         </a>
       ))}
+    </nav>
+
+    <!-- Right cluster -->
+    <div class="flex items-center gap-3">
+      <!-- Telegram button: full label on lg+, short on md, hidden below sm -->
       <a
         href={site.telegram}
         target="_blank"
         rel="noopener"
-        class="btn-ink hidden md:inline-flex"
+        class="btn-ink whitespace-nowrap px-4 py-2 text-xs tracking-[0.15em] md:px-6 md:py-3 md:text-sm"
       >
-        Telegram
+        <span class="hidden sm:inline">Telegram</span>
+        <span class="sm:hidden">TG</span>
       </a>
-    </nav>
+
+      <!-- Mobile/tablet menu (<lg) -->
+      <details class="relative lg:hidden">
+        <summary
+          class="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-ink/70 text-ink list-none [&::-webkit-details-marker]:hidden"
+          aria-label="Открыть меню"
+        >
+          <svg viewBox="0 0 24 24" class="h-5 w-5" aria-hidden="true">
+            <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none" />
+          </svg>
+        </summary>
+        <nav class="absolute right-0 top-12 z-50 w-56 rounded-2xl border border-ink bg-cream p-2 shadow-xl">
+          {nav.map((item) => (
+            <a
+              href={item.href}
+              class="block rounded-xl px-4 py-3 text-sm text-ink hover:bg-ink hover:text-cream"
+            >
+              {item.label}
+            </a>
+          ))}
+        </nav>
+      </details>
+    </div>
   </div>
 </header>

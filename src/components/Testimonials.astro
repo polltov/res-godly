@@ -28,10 +28,10 @@ import { testimonials } from '../data/testimonials';
       </svg>
     </div>
 
-    <div class="grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-10">
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-10">
       {testimonials.map((t, i) => (
-        <figure class={`border-y border-ink py-8 md:py-10 ${i === 1 ? 'md:border-l md:border-r-0 md:pl-10' : ''}`}>
-          <blockquote class="font-display text-2xl leading-[1.15] md:text-4xl">
+        <figure class={`border-y border-ink py-8 lg:py-10 ${i === 1 ? 'lg:border-l lg:border-r-0 lg:pl-10' : ''}`}>
+          <blockquote class="font-display text-2xl leading-[1.15] md:text-3xl lg:text-4xl">
             «{t.quote}»
           </blockquote>
           <figcaption class="label mt-6 text-ink/70">— {t.client}</figcaption>
